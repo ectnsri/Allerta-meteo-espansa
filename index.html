@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>Allerta Milano</title>
+<title>Allerta Protezione Civile Milano</title>
 
 <style>
 
@@ -12,186 +12,135 @@ html,body{
     margin:0;
     padding:0;
     font-family:Segoe UI,Arial,sans-serif;
-    background:#f5f5f5;
+    background:#ffffff;
+}
+
+.widget{
+    width:100%;
+    max-width:850px;
+    margin:auto;
+    background:white;
+    border:1px solid #d9d9d9;
+    border-radius:12px;
+    padding:16px;
+    box-sizing:border-box;
+}
+
+.titolo{
+    text-align:center;
+    font-size:24px;
+    font-weight:700;
+    margin-bottom:4px;
+}
+
+.sottotitolo{
+    text-align:center;
+    color:#666;
+    font-size:12px;
+    margin-bottom:15px;
+}
+
+.tabella{
+    display:grid;
+    grid-template-columns:220px 1fr 1fr 1fr;
+    gap:8px;
+    align-items:center;
 }
 
 .header{
-    background:white;
-    padding:15px;
     text-align:center;
-    border-bottom:1px solid #e0e0e0;
+    font-weight:700;
+    padding:8px;
 }
 
-.header h1{
-    margin:0;
-    color:#2e7d32;
-    font-size:28px;
+.riga{
+    font-weight:600;
+}
+
+.cella{
+    text-align:center;
+    padding:10px;
+    border-radius:8px;
+    color:white;
     font-weight:700;
 }
 
-.container{
-    padding:15px;
-}
-
-.cards{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-    gap:12px;
-}
-
-.card{
-    background:white;
-    border-radius:10px;
-    padding:16px;
-    text-align:center;
-    box-shadow:0 2px 5px rgba(0,0,0,.15);
-}
-
-.icona{
-    font-size:42px;
-    margin-bottom:10px;
-}
-
-.nome{
-    font-size:18px;
-    font-weight:600;
-    color:#333;
-}
-
-.stato{
-    margin-top:10px;
-    padding:8px;
-    border-radius:20px;
-    font-weight:600;
-    color:#333;
-    background:#f2f2f2;
-}
-
-.dot{
-    width:12px;
-    height:12px;
-    border-radius:50%;
-    display:inline-block;
-    margin-right:8px;
-}
-
-.section{
-    margin-top:20px;
-    background:white;
-    border-radius:10px;
-    padding:15px;
-    box-shadow:0 2px 5px rgba(0,0,0,.15);
-}
-
-.section h2{
-    margin-top:0;
-    color:#2e7d32;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-th{
-    background:#f5f5f5;
-}
-
-th,td{
-    padding:10px;
-    text-align:center;
-    border-bottom:1px solid #eaeaea;
-}
-
-.bullet{
-    font-size:24px;
-    font-weight:bold;
-}
-
-.button-container{
-    text-align:center;
-    margin-top:18px;
-}
-
-.button{
-    display:inline-block;
-    background:#2e7d32;
-    color:white;
-    text-decoration:none;
-    padding:12px 24px;
-    border-radius:6px;
-    font-weight:600;
-}
-
-.button:hover{
-    opacity:.9;
-}
-
 .footer{
-    margin-top:15px;
+    margin-top:16px;
+    border-top:1px solid #eee;
+    padding-top:10px;
     text-align:center;
-    font-size:12px;
+    font-size:11px;
     color:#666;
 }
 
-@media(max-width:768px){
-
-    .header h1{
-        font-size:24px;
-    }
-
-    table{
-        font-size:12px;
-    }
-
+.aggiornamento{
+    margin-top:6px;
 }
 
 </style>
+
 </head>
+
 <body>
 
-<div class="header">
-    <h1>Allerta Milano</h1>
-</div>
+<div class="widget">
 
-<div class="container">
+    <div class="titolo">
+        Allerta Meteo Milano
+    </div>
+
+    <div class="sottotitolo">
+        Protezione Civile Lombardia
+    </div>
 
     <div id="contenuto">
-        Caricamento bollettino...
+        Caricamento dati...
     </div>
 
 </div>
 
 <script>
 
-function colore(valore){
+function coloreSemaforo(colore){
 
-    if(!valore) return "#4caf50";
+    if(!colore) return "#2e7d32";
 
-    valore = valore.toLowerCase();
+    colore = colore.toLowerCase();
 
-    if(valore === "rosso")
+    if(colore === "rosso")
         return "#d32f2f";
 
-    if(valore === "arancione")
+    if(colore === "arancione")
         return "#ef6c00";
 
-    if(valore === "giallo")
+    if(colore === "giallo")
         return "#fbc02d";
 
-    return "#4caf50";
+    return "#2e7d32";
+}
+
+function formatDate(date){
+
+    return date.toLocaleDateString("it-IT",{
+        day:"2-digit",
+        month:"2-digit"
+    });
+
 }
 
 function salvaStorico(coloreOggi){
 
-    const data = new Date().toISOString().substring(0,10);
+    const oggi = new Date().toISOString().substring(0,10);
+
+    const record = {
+        data: oggi,
+        colore: coloreOggi
+    };
 
     localStorage.setItem(
-        "allertaMilano",
-        JSON.stringify({
-            data:data,
-            colore:coloreOggi
-        })
+        "allerta_milano_oggi",
+        JSON.stringify(record)
     );
 }
 
@@ -199,146 +148,173 @@ function recuperaIeri(){
 
     try{
 
-        const s =
-            localStorage.getItem("allertaMilano");
+        const raw =
+            localStorage.getItem("allerta_milano_oggi");
 
-        if(!s)
+        if(!raw)
             return "verde";
 
-        const obj =
-            JSON.parse(s);
+        const obj = JSON.parse(raw);
 
         return obj.colore || "verde";
 
     }
-    catch{
+    catch(e){
 
         return "verde";
+
     }
+
 }
 
 async function aggiorna(){
 
-try{
+    try{
 
-const response =
-await fetch(
-"https://allertameteo.app/api/alert/Milano"
+        const response =
+            await fetch(
+                "https://allertameteo.app/api/alert/Milano"
+            );
+
+        const json = await response.json();
+
+        const d = json.data;
+
+        const oggiColore =
+            d.oggi.allerta.colore;
+
+        const domaniColore =
+            d.domani.allerta.colore;
+
+        const ieriColore =
+            recuperaIeri();
+
+        salvaStorico(oggiColore);
+
+        const ieriData = new Date();
+        ieriData.setDate(ieriData.getDate()-1);
+
+        document.getElementById("contenuto").innerHTML = `
+
+        <div class="tabella">
+
+            <div></div>
+
+            <div class="header">
+                ${formatDate(ieriData)}
+            </div>
+
+            <div class="header">
+                ${d.bulletin_info.data_oggi}
+            </div>
+
+            <div class="header">
+                ${d.bulletin_info.data_domani}
+            </div>
+
+            <div class="riga">
+                🌊 Criticità Idraulica
+            </div>
+
+            <div class="cella"
+                 style="background:${coloreSemaforo(ieriColore)}">
+                 ${ieriColore}
+            </div>
+
+            <div class="cella"
+                 style="background:${coloreSemaforo(oggiColore)}">
+                 ${oggiColore}
+            </div>
+
+            <div class="cella"
+                 style="background:${coloreSemaforo(domaniColore)}">
+                 ${domaniColore}
+            </div>
+
+            <div class="riga">
+                ⛰️ Criticità Idrogeologica
+            </div>
+
+            <div class="cella"
+                 style="background:${coloreSemaforo(ieriColore)}">
+                 ${ieriColore}
+            </div>
+
+            <div class="cella"
+                 style="background:${coloreSemaforo(oggiColore)}">
+                 ${oggiColore}
+            </div>
+
+            <div class="cella"
+                 style="background:${coloreSemaforo(domaniColore)}">
+                 ${domaniColore}
+            </div>
+
+            <div class="riga">
+                ⛈️ Temporali Forti
+            </div>
+
+            <div class="cella"
+                 style="background:${coloreSemaforo(ieriColore)}">
+                 ${ieriColore}
+            </div>
+
+            <div class="cella"
+                 style="background:${coloreSemaforo(oggiColore)}">
+                 ${oggiColore}
+            </div>
+
+            <div class="cella"
+                 style="background:${coloreSemaforo(domaniColore)}">
+                 ${domaniColore}
+            </div>
+
+        </div>
+
+        <div class="footer">
+
+            Zona:
+            ${d.zona}
+
+            <div class="aggiornamento">
+
+                Bollettino emesso il
+                ${d.bulletin_info.data_bollettino}
+                alle
+                ${d.bulletin_info.ora_bollettino}
+
+            </div>
+
+            <div class="aggiornamento">
+
+                Fonte:
+                AllertaMeteo.app /
+                Protezione Civile Lombardia
+
+            </div>
+
+        </div>
+
+        `;
+
+    }
+    catch(err){
+
+        document.getElementById("contenuto").innerHTML =
+        "Errore nel caricamento del bollettino.";
+
+    }
+
+}
+
+aggiorna();
+
+setInterval(
+    aggiorna,
+    900000
 );
 
-const json =
-await response.json();
+</script>
 
-const d = json.data;
-
-const oggi =
-d.oggi.allerta.colore;
-
-const domani =
-d.domani.allerta.colore;
-
-const ieri =
-recuperaIeri();
-
-salvaStorico(oggi);
-
-const colOggi =
-colore(oggi);
-
-const colDomani =
-colore(domani);
-
-const colIeri =
-colore(ieri);
-
-document.getElementById("contenuto").innerHTML = `
-
-<div class="cards">
-
-<div class="card">
-<div class="icona">⛰️</div>
-<div class="nome">Idrogeologico</div>
-<div class="stato">
-<span class="dot"
-style="background:${colOggi}">
-</span>
-${d.oggi.allerta.descrizione}
-</div>
-</div>
-
-<div class="card">
-<div class="icona">🌊</div>
-<div class="nome">Idraulico</div>
-<div class="stato">
-<span class="dot"
-style="background:${colOggi}">
-</span>
-${d.oggi.allerta.descrizione}
-</div>
-</div>
-
-<div class="card">
-<div class="icona">⛈️</div>
-<div class="nome">Temporali</div>
-<div class="stato">
-<span class="dot"
-style="background:${colOggi}">
-</span>
-${d.oggi.allerta.descrizione}
-</div>
-</div>
-
-<div class="card">
-<div class="icona">💨</div>
-<div class="nome">Vento forte</div>
-<div class="stato">
-<span class="dot"
-style="background:${colOggi}">
-</span>
-${d.oggi.allerta.descrizione}
-</div>
-</div>
-
-<div class="card">
-<div class="icona">❄️</div>
-<div class="nome">Neve</div>
-<div class="stato">
-<span class="dot"
-style="background:${colOggi}">
-</span>
-${d.oggi.allerta.descrizione}
-</div>
-</div>
-
-</div>
-
-<div class="section">
-
-<h2>Andamento criticità</h2>
-
-<table>
-
-<tr>
-<th>Fenomeno</th>
-<th>Ieri</th>
-<th>Oggi</th>
-<th>Domani</th>
-</tr>
-
-<tr>
-<td>🌊 Idraulico</td>
-<td class="bullet" style="color:${colIeri}">●</td>
-<td class="bullet" style="color:${colOggi}">●</td>
-<td class="bullet" style="color:${colDomani}">●</td>
-</tr>
-
-<tr>
-<td>⛰️ Idrogeologico</td>
-<td class="bullet" style="color:${colIeri}">●</td>
-<td class="bullet" style="color:${colOggi}">●</td>
-<td class="bullet" style="color:${colDomani}">●</td>
-</tr>
-
-<tr>
-<td>⛈️ Temporali</td>
-<td class="bullet" style="color:${colIeri}
+</body>
+</html>
