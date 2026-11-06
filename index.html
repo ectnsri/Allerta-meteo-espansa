@@ -48,7 +48,7 @@ html,body{
 .tabella{
     display:grid;
     grid-template-columns:220px 1fr 1fr 1fr;
-    gap:8px;
+    gap:12px;
     align-items:center;
 }
 
@@ -57,19 +57,21 @@ html,body{
     font-weight:700;
     padding:8px;
     color:#39ff14;
+    font-size:18px;
 }
 
 .riga{
     font-weight:600;
     color:white;
+    font-size:16px;
 }
 
 .cella{
     text-align:center;
-    padding:10px;
-    border-radius:8px;
-    color:white;
+    padding:14px;
+    border-radius:10px;
     font-weight:700;
+    font-size:16px;
 }
 
 .footer{
@@ -89,6 +91,14 @@ html,body{
 
     .tabella{
         grid-template-columns:140px 1fr 1fr 1fr;
+        font-size:13px;
+    }
+
+    .header{
+        font-size:14px;
+    }
+
+    .riga{
         font-size:13px;
     }
 
@@ -137,6 +147,19 @@ function coloreSemaforo(colore){
     return "#39ff14";
 }
 
+function coloreTesto(colore){
+
+    if(!colore)
+        return "#000000";
+
+    colore = colore.toLowerCase();
+
+    if(colore === "verde")
+        return "#000000";
+
+    return "#ffffff";
+}
+
 function formatDate(date){
 
     return date.toLocaleDateString("it-IT",{
@@ -179,6 +202,19 @@ function recuperaIeri(){
 
         return "verde";
     }
+}
+
+function creaCella(colore){
+
+    return `
+    <div class="cella"
+         style="
+            background:${coloreSemaforo(colore)};
+            color:${coloreTesto(colore)};
+         ">
+         ${colore}
+    </div>
+    `;
 }
 
 async function aggiorna(){
@@ -232,58 +268,25 @@ async function aggiorna(){
                 🌊 Criticità Idraulica
             </div>
 
-            <div class="cella"
-                 style="background:${coloreSemaforo(ieriColore)}">
-                 ${ieriColore}
-            </div>
-
-            <div class="cella"
-                 style="background:${coloreSemaforo(oggiColore)}">
-                 ${oggiColore}
-            </div>
-
-            <div class="cella"
-                 style="background:${coloreSemaforo(domaniColore)}">
-                 ${domaniColore}
-            </div>
+            ${creaCella(ieriColore)}
+            ${creaCella(oggiColore)}
+            ${creaCella(domaniColore)}
 
             <div class="riga">
                 ⛰️ Criticità Idrogeologica
             </div>
 
-            <div class="cella"
-                 style="background:${coloreSemaforo(ieriColore)}">
-                 ${ieriColore}
-            </div>
-
-            <div class="cella"
-                 style="background:${coloreSemaforo(oggiColore)}">
-                 ${oggiColore}
-            </div>
-
-            <div class="cella"
-                 style="background:${coloreSemaforo(domaniColore)}">
-                 ${domaniColore}
-            </div>
+            ${creaCella(ieriColore)}
+            ${creaCella(oggiColore)}
+            ${creaCella(domaniColore)}
 
             <div class="riga">
                 ⛈️ Temporali Forti
             </div>
 
-            <div class="cella"
-                 style="background:${coloreSemaforo(ieriColore)}">
-                 ${ieriColore}
-            </div>
-
-            <div class="cella"
-                 style="background:${coloreSemaforo(oggiColore)}">
-                 ${oggiColore}
-            </div>
-
-            <div class="cella"
-                 style="background:${coloreSemaforo(domaniColore)}">
-                 ${domaniColore}
-            </div>
+            ${creaCella(ieriColore)}
+            ${creaCella(oggiColore)}
+            ${creaCella(domaniColore)}
 
         </div>
 
