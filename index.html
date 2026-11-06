@@ -47,7 +47,7 @@ html,body{
 
 .tabella{
     display:grid;
-    grid-template-columns:220px 1fr 1fr 1fr;
+    grid-template-columns:220px 1fr 1fr;
     gap:12px;
     align-items:center;
 }
@@ -90,7 +90,7 @@ html,body{
 @media(max-width:700px){
 
     .tabella{
-        grid-template-columns:140px 1fr 1fr 1fr;
+        grid-template-columns:140px 1fr 1fr;
         font-size:13px;
     }
 
@@ -160,50 +160,6 @@ function coloreTesto(colore){
     return "#ffffff";
 }
 
-function formatDate(date){
-
-    return date.toLocaleDateString("it-IT",{
-        day:"2-digit",
-        month:"2-digit"
-    });
-}
-
-function salvaStorico(coloreOggi){
-
-    const oggi = new Date().toISOString().substring(0,10);
-
-    const record = {
-        data: oggi,
-        colore: coloreOggi
-    };
-
-    localStorage.setItem(
-        "allerta_milano_oggi",
-        JSON.stringify(record)
-    );
-}
-
-function recuperaIeri(){
-
-    try{
-
-        const raw =
-            localStorage.getItem("allerta_milano_oggi");
-
-        if(!raw)
-            return "verde";
-
-        const obj = JSON.parse(raw);
-
-        return obj.colore || "verde";
-
-    }
-    catch(e){
-
-        return "verde";
-    }
-}
-
 function creaCella(colore){
 
     return `
@@ -236,25 +192,11 @@ async function aggiorna(){
         const domaniColore =
             d.domani.allerta.colore;
 
-        const ieriColore =
-            recuperaIeri();
-
-        salvaStorico(oggiColore);
-
-        const ieriData = new Date();
-        ieriData.setDate(
-            ieriData.getDate()-1
-        );
-
         document.getElementById("contenuto").innerHTML = `
 
         <div class="tabella">
 
             <div></div>
-
-            <div class="header">
-                ${formatDate(ieriData)}
-            </div>
 
             <div class="header">
                 ${d.bulletin_info.data_oggi}
@@ -268,7 +210,6 @@ async function aggiorna(){
                 🌊 Criticità Idraulica
             </div>
 
-            ${creaCella(ieriColore)}
             ${creaCella(oggiColore)}
             ${creaCella(domaniColore)}
 
@@ -276,7 +217,6 @@ async function aggiorna(){
                 ⛰️ Criticità Idrogeologica
             </div>
 
-            ${creaCella(ieriColore)}
             ${creaCella(oggiColore)}
             ${creaCella(domaniColore)}
 
@@ -284,7 +224,6 @@ async function aggiorna(){
                 ⛈️ Temporali Forti
             </div>
 
-            ${creaCella(ieriColore)}
             ${creaCella(oggiColore)}
             ${creaCella(domaniColore)}
 
